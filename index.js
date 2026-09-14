@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 
 const {
   SecretsManagerClient,
@@ -21,6 +22,29 @@ if (!AWS_REGION || !SNS_SECRET_ID) {
 }
 
 app.use(express.json());
+
+const allowedOrigins = new Set(
+  (process.env.FRONTEND_ORIGINS || [
+    'https://tejasnashikkar.online',
+    'https://www.tejasnashikkar.online',
+    'https://d35mqdfvop40am.cloudfront.net'
+  ].join(','))
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origin is not allowed by CORS'));
+  },
+  methods: ['POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 
 const client = new SecretsManagerClient({
   region: AWS_REGION
