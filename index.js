@@ -81,10 +81,10 @@ app.post('/message', async (req, res) => {
     const message = req.body;
 
     // Simple validation rule
-    if (!message.text) {
+    if (!message) {
         return res.status(400).json({ 
             success: false, 
-            message: 'Missing required field: text' 
+            message: 'Missing required field: message' 
         });
     }
 
